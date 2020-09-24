@@ -45,11 +45,11 @@ public class Controller {
 		if (u != null)
 			return new ResponseEntity<String>("User Registered succesfully,userid:"+u.getUserId(), HttpStatus.OK);
 		else
-			return new ResponseEntity<String>("booking unsuccesful", HttpStatus.OK);
+			return new ResponseEntity<String>("Registration unsuccesful", HttpStatus.OK);
 	}
 
 	// For login check
-	@GetMapping("/CheckLogin/{userid}/{password}")
+	@PostMapping("/CheckLogin/{userid}/{password}")
 	public ResponseEntity<String> loginVerification(@PathVariable int userid, @PathVariable String password) {
 		Users user = userservice.loginCheck(userid, password);
 		if (user != null) {

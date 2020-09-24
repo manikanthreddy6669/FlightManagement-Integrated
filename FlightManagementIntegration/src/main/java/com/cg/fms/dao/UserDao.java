@@ -7,7 +7,7 @@ import com.cg.fms.dto.Users;
 
 public interface UserDao extends JpaRepository<Users,Integer> {
 	
-	@Query("select r from Users r where r.username=?1 and r.password=?2")
+	@Query("select r from Users r where r.userId=?1 and r.password=?2")
 	Users loginCheck(int userid, String password);
 
 }
