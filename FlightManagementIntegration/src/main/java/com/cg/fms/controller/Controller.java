@@ -43,13 +43,13 @@ public class Controller {
 
 		Users u = userservice.registerDetails(user);
 		if (u != null)
-			return new ResponseEntity<String>("User Registered succesfully", HttpStatus.OK);
+			return new ResponseEntity<String>("User Registered succesfully,userid:"+u.getUserId(), HttpStatus.OK);
 		else
 			return new ResponseEntity<String>("booking unsuccesful", HttpStatus.OK);
 	}
 
 	// For login check
-	@PostMapping("/CheckLogin/{username}/{password}")
+	@GetMapping("/CheckLogin/{userid}/{password}")
 	public ResponseEntity<String> loginVerification(@PathVariable int userid, @PathVariable String password) {
 		Users user = userservice.loginCheck(userid, password);
 		if (user != null) {

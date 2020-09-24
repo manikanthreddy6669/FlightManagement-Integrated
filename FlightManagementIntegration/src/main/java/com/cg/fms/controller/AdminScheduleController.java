@@ -23,90 +23,72 @@ import com.cg.fms.dao.ScheduledFlightsDao;
 import com.cg.fms.dto.FlightSchedule;
 import com.cg.fms.service.IFlightSchedule;
 
-@RestController 
+@RestController
 @CrossOrigin(origins = "http://localhost:4200")
 public class AdminScheduleController {
-	
+
 	@Autowired
 	private IFlightSchedule flight_Scheduling_Service;
-	
+
 	@Autowired
 	private ScheduledFlightsDao flight_Scheduling_DAO;
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AdminScheduleController.class);
 
-	
-	   //add FlightSchedule	
-	   @PostMapping("/addFlightSchedule")
-	   public ResponseEntity<String> addFlightSchedule( @RequestBody FlightSchedule flight_Schedule)
-		{
-	
-			try {
-				flight_Scheduling_Service.addFlightSchedule(flight_Schedule);
-				LOGGER.info("Add Flight Schedule method is accessed");
-				return new ResponseEntity<>("Flight Schedule details added",HttpStatus.OK);
-			} 
-			catch (DataIntegrityViolationException ex) {
-				return new ResponseEntity<>(ex.getMessage() + "Flight Schedule details already added", HttpStatus.BAD_REQUEST);
-			}
-		}
-		
-		//update Flight schedule
-		@PutMapping("/updateFlightSchedule/{id}")
-		public ResponseEntity<Object> updateFlightSchedule(@PathVariable("id") String scheduleId, @RequestBody FlightSchedule flight_Scheduling)throws Flight_Schedule_NotFoundException
-		{
-			if (flight_Scheduling_DAO.existsById(scheduleId))
-			{
-				flight_Scheduling_Service.updateFlightSchedule(flight_Scheduling);
-				LOGGER.info("update Flight Schedule method is accessed");
-				return new ResponseEntity<>("Flight Schedule is updated successsfully", HttpStatus.OK);
-			}
-			else
-			{
-				throw new Flight_Schedule_NotFoundException();
-			}
-		}
-		
+	// add FlightSchedule
+	@PostMapping("/addFlightSchedule")
+	public ResponseEntity<String> addFlightSchedule(@RequestBody FlightSchedule flight_Schedule) {
 
-		//view Flight Schedule By Id
-		@GetMapping("/viewFlightSchedule/{id}")
-		public ResponseEntity<Object> viewFlightSchedule(@PathVariable("id") String scheduleId)
-		{
-		    Optional<FlightSchedule> flightSchedule= flight_Scheduling_DAO.findById(scheduleId);
-		    if (flightSchedule.isPresent())
-		    {
-		      LOGGER.info("View Flight Schedule method is accessed");	
-		      return new ResponseEntity<>(flightSchedule.get(), HttpStatus.OK);
-		    }
-		    else
-		    {
-		      return new ResponseEntity<>("Flight Schedule not found",HttpStatus.NOT_FOUND);
-		    }
-		 }
-		
-		
-		//view FlightSchedules
-		@GetMapping("/viewFlightSchedule")
-		public ResponseEntity<Object> viewFlightSchedules()
-		{
-			List<FlightSchedule> flightScheduleList = flight_Scheduling_Service.viewFlightSchedules();
-			return new ResponseEntity<>(flightScheduleList, HttpStatus.OK);
-		}
+		if (!flight_Scheduling_DAO.existsById(flight_Schedule.getScheduleId())) {
+			flight_Scheduling_Service.addFlightSchedule(flight_Schedule);
+			LOGGER.info("Add Flight Schedule method is accessed");
+			return new ResponseEntity<>("Flight Schedule details added", HttpStatus.OK);
+		} else
+			return new ResponseEntity<>("Flight Schedule with given id already exists", HttpStatus.ALREADY_REPORTED);
+	}
 
-		
-		//Delete Flight Schedule By Id
-		@DeleteMapping("/deleteFlightSchedule/{id}")
-		public ResponseEntity<Object> deleteFlightSchedule(@PathVariable("id") String scheduleId)throws Flight_Schedule_NotFoundException
-		{
-			if (flight_Scheduling_DAO.existsById(scheduleId))
-			{
-				flight_Scheduling_Service.deleteFlightSchedule(scheduleId);
-				LOGGER.info("Delete Flight Schedule method is accessed");
-				return new ResponseEntity<>("Flight Schedule is deleted successsfully", HttpStatus.OK);
-			}
-			else
-			{
-				throw new Flight_Schedule_NotFoundException();
-			}
+	// update Flight schedule
+	@PutMapping("/updateFlightSchedule/{id}")
+	public ResponseEntity<Object> updateFlightSchedule(@PathVariable("id") String scheduleId,
+			@RequestBody FlightSchedule flight_Scheduling) throws Flight_Schedule_NotFoundException {
+		if (flight_Scheduling_DAO.existsById(scheduleId)) {
+			flight_Scheduling_Service.updateFlightSchedule(flight_Scheduling);
+			LOGGER.info("update Flight Schedule method is accessed");
+			return new ResponseEntity<>("Flight Schedule is updated successsfully", HttpStatus.OK);
+		} else {
+			throw new Flight_Schedule_NotFoundException("Given schedule:" + scheduleId + " not found");
 		}
+	}
+
+	// view Flight Schedule By Id
+	@GetMapping("/viewFlightSchedule/{id}")
+	public ResponseEntity<Object> viewFlightSchedule(@PathVariable("id") String scheduleId) {
+		Optional<FlightSchedule> flightSchedule = flight_Scheduling_DAO.findById(scheduleId);
+		if (flightSchedule.isPresent()) {
+			LOGGER.info("View Flight Schedule method is accessed");
+			return new ResponseEntity<>(flightSchedule.get(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>("Flight Schedule not found", HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// view FlightSchedules
+	@GetMapping("/viewFlightSchedule")
+	public ResponseEntity<Object> viewFlightSchedules() {
+		List<FlightSchedule> flightScheduleList = flight_Scheduling_Service.viewFlightSchedules();
+		return new ResponseEntity<>(flightScheduleList, HttpStatus.OK);
+	}
+
+	// Delete Flight Schedule By Id
+	@DeleteMapping("/deleteFlightSchedule/{id}")
+	public ResponseEntity<Object> deleteFlightSchedule(@PathVariable("id") String scheduleId)
+			throws Flight_Schedule_NotFoundException {
+		if (flight_Scheduling_DAO.existsById(scheduleId)) {
+			flight_Scheduling_Service.deleteFlightSchedule(scheduleId);
+			LOGGER.info("Delete Flight Schedule method is accessed");
+			return new ResponseEntity<>("Flight Schedule is deleted successsfully", HttpStatus.OK);
+		} else {
+			throw new Flight_Schedule_NotFoundException();
+		}
+	}
 }
